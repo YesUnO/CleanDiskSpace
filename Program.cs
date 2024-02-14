@@ -21,8 +21,8 @@ try
     }
     else
     {
-        decimal freeSpaceForLog = freeSpace / 1024 / 1024 / 1024;
-        Console.WriteLine($"Free space on C drive: {freeSpaceForLog} GB. No action needed.");
+        decimal freeSpaceForLogInGB = freeSpace / 1024 / 1024 / 1024;
+        Console.WriteLine($"Free space on C drive: {freeSpaceForLogInGB} GB. No action needed.");
     }
 }
 catch (Exception ex)
@@ -35,6 +35,11 @@ void DeleteFolderContent(string folderPath)
 {
     foreach (var file in Directory.EnumerateFiles(folderPath, "*", SearchOption.AllDirectories))
     {
+        FileInfo fileInfo = new FileInfo(file);
+        DateTime lastUpdatedDate = fileInfo.LastWriteTime;
+        bool isLessThanOneDayOld = (DateTime.Now - lastUpdatedDate).TotalHours < 24;
+        if (isLessThanOneDayOld) continue;
+
         try
         {
             File.Delete(file);
@@ -47,6 +52,11 @@ void DeleteFolderContent(string folderPath)
 
     foreach (var dir in Directory.EnumerateDirectories(folderPath))
     {
+        DirectoryInfo directoryInfo = new DirectoryInfo(dir);
+        DateTime lastUpdatedDate = directoryInfo.LastWriteTime;
+        bool isLessThanOneDayOld = (DateTime.Now - lastUpdatedDate).TotalHours < 24;
+        if (isLessThanOneDayOld) continue;
+
         try
         {
             Directory.Delete(dir, true);
